@@ -8,7 +8,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 
 # Extracts participants, emails, and exclusions from CSV file
-with open('SS-participants.csv', newline='') as f:
+with open('assets/SS-participants.csv', newline='') as f:
     reader = csv.reader(f)
     participant_data = list(reader)
 
@@ -126,7 +126,7 @@ for i in names_drawn:
     """
 
     # Assumes the image is in the current directory
-    fp = open('secretsanta.jpg', 'rb')
+    fp = open('assets/secretsanta.jpg', 'rb')
     msgImage = MIMEImage(fp.read())
     fp.close()
 
