@@ -17,12 +17,7 @@ participants = [i[1] for i in participant_data[1:]]
 names_drawn = []
 
 # Initialize seed
-SEED = 2019
-
-# Creates a string of integers using the seed that will determine the order of future random integers
-random.seed(SEED)
-s = str(random.random())
-s_index = 2
+random.seed(2019)
 
 # Generates a chain until it is valid
 isValid = False
@@ -33,61 +28,40 @@ while not isValid:
     names_drawn = [i[:2] for i in participant_data[1:]]
 
     isValid = True
-    drawn = ""
-    first_drawn = ""
 
-    for i in range(len(participants)):
+    # The first drawn name does not need to be checked for exclusions
+    rand = temp_participants[random.randint(0, len(temp_participants)) - 1]
+    first_drawn = rand
+    temp_participants.remove(rand)
 
-        # Breaks loop when the chain becomes invalid
-        if not isValid:
+    for i in range(len(temp_participants)):
+
+        last_index = participants.index(rand)
+
+        # Create set of exclusions for the last drawn name
+        exclusions = set(participant_data[last_index + 1][2:])
+
+        # Create list of valid participants using the remaining names and the exclusion list
+        valid_participants = [item for item in temp_participants if item not in exclusions]
+
+        # The chain is invalid if there are no remaining valid participants
+        if not len(valid_participants):
+            isValid = False
             break
 
-        # Check for exclusions only after the first name has been generated
-        if len(temp_participants) < len(participants):
-            rand = drawn
-            last_index = participants.index(rand)
-
-            # The chain is invalid if all of the remaining names are in the exclusions list of the generated name
-            if all(i in participant_data[last_index + 1][1:] for i in temp_participants):
-                isValid = False
-
-            else:
-                # Generate a name until there is one that is not in the exclusions list
-                while rand in participant_data[last_index + 1][1:]:
-
-                    # Generates a random integer using the next integer in the SEED string as the seed
-                    random.seed(int(s[s_index]))
-                    s_index += 1
-                    rand = temp_participants[random.randint(0, len(temp_participants)) - 1]
-
-                    # Increase SEED by 1 to use a new string of integers when the previous one runs out
-                    if s_index == len(s):
-                        SEED += 1
-                        random.seed(SEED)
-                        s = str(random.random())
-                        s_index = 2
-
-                # Add the new generated name to the names drawn list next to the last generated name
-                names_drawn[last_index].append(rand)
         else:
-            random.seed(int(s[s_index]))
-            s_index += 1
-            rand = temp_participants[random.randint(0, len(temp_participants)) - 1]
-            first_drawn = rand
+
+            # Generates a random name from the remaining valid names
+            rand = valid_participants[random.randint(0, len(valid_participants)) - 1]
+
+            # Add the new generated name to the names drawn list next to the last generated name
+            names_drawn[last_index].append(rand)
 
         # Add the valid name to the chain
-        if isValid:
-            drawn = rand
-            temp_participants.remove(rand)
-
-        if s_index == len(s):
-            SEED += 1
-            random.seed(SEED)
-            s = str(random.random())
-            s_index = 2
+        temp_participants.remove(rand)
 
     # The chain is invalid if the first name is in the exclusions list of the last name
-    last_index = participants.index(drawn)
+    last_index = participants.index(rand)
     if first_drawn in participant_data[last_index + 1][1:]:
         isValid = False
     else:
